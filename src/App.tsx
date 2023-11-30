@@ -2,38 +2,26 @@ import React, { useState } from "react";
 import "./App.css";
 import { Uploader } from "./utils/Uploader";
 import { FileInputComponent } from "./components/FileInputComponent";
+import { useUploadParameters } from "./useUploadParameters";
 
 function App() {
+  const {
+    apiBaseUrl,
+    apiKey,
+    patientId,
+    laboratoryId,
+    handleApiBaseUrlChange,
+    handleApiKeyChange,
+    handleLaboratoryIdChange,
+    handlePatientIdChange,
+    areParametersValid,
+  } = useUploadParameters();
+
+  // FILES TO UPLOAD
   const [file, setFile] = useState<any>(undefined);
   const [uploader, setUploader] = useState<any>(undefined);
   const [progress, setProgress] = useState(0);
-  const [apiBaseUrl, setApiBaseUrl] = useState<string>(
-    process.env.REACT_APP_API_BASE_URL ?? ""
-  );
-  const [apiKey, setApiKey] = useState<string>("");
   const [objectKey, setObjectKey] = useState<string>("");
-  const [patientId, setPatientId] = useState<string>("");
-  const [laboratoryId, setLaboratoryId] = useState<string>("");
-
-  const handleApiBaseUrlChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setApiBaseUrl(event.target.value);
-  };
-
-  const handleApiKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setApiKey(event.target.value);
-  };
-  const handlePatientIdChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setPatientId(event.target.value);
-  };
-  const handleLaboratoryIdChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setLaboratoryId(event.target.value);
-  };
 
   const handleFileSelect = (files: FileList | null) => {
     if (files) {
@@ -43,8 +31,6 @@ function App() {
 
   const uploadFile = () => {
     if (file) {
-      console.log(file);
-
       let percentage: any = undefined;
 
       const videoUploaderOptions = {
@@ -100,7 +86,7 @@ function App() {
             onChange={handleApiBaseUrlChange}
           />
         </div>
-        <div className="key">
+        <div>
           <span>API Key: </span>
           <input type="password" value={apiKey} onChange={handleApiKeyChange} />
         </div>
@@ -133,14 +119,7 @@ function App() {
         <h3 className="title">Controls:</h3>
         <div>
           <button
-            disabled={
-              file === undefined ||
-              progress > 0 ||
-              apiBaseUrl === "" ||
-              apiKey === "" ||
-              patientId === "" ||
-              laboratoryId === ""
-            }
+            disabled={file === undefined || progress > 0 || !areParametersValid}
             onClick={uploadFile}
           >
             Start Upload !
