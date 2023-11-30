@@ -7,6 +7,10 @@
   padding: 50px;
 }
 
+.title {
+  text-decoration: underline;
+}
+
 .apiSettings {
   display: flex;
   flex-direction: column;
@@ -36,9 +40,6 @@
   gap: 5px;
 }
 
-.fileInput .title {
-  text-decoration: underline;
-}
 
 .fileInput .uploadProgress {
   display: flex;
@@ -55,4 +56,18 @@
 .fileInput .objectKey {
   text-align: left;
   text-wrap: wrap;
+}
+
+.controls {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.controls div {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
 }
