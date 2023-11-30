@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
-import FileUpload from "./components/FileUploadComponent";
 import { Uploader } from "./utils/Uploader";
+import { FileInputComponent } from "./components/FileInputComponent";
 
 function App() {
   const [file, setFile] = useState<any>(undefined);
@@ -15,7 +15,6 @@ function App() {
   const [patientId, setPatientId] = useState<string>("");
   const [laboratoryId, setLaboratoryId] = useState<string>("");
 
-
   const handleApiBaseUrlChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -25,7 +24,9 @@ function App() {
   const handleApiKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setApiKey(event.target.value);
   };
-  const handlePatientIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePatientIdChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setPatientId(event.target.value);
   };
   const handleLaboratoryIdChange = (
@@ -33,7 +34,6 @@ function App() {
   ) => {
     setLaboratoryId(event.target.value);
   };
-
 
   const handleFileSelect = (files: FileList | null) => {
     if (files) {
@@ -52,7 +52,7 @@ function App() {
         apiBaseUrl: apiBaseUrl,
         apiKey: apiKey,
         patientId: patientId,
-        laboratoryId: laboratoryId
+        laboratoryId: laboratoryId,
       };
       const uploader = new Uploader(videoUploaderOptions);
       setUploader(uploader);
@@ -104,44 +104,49 @@ function App() {
           <span>API Key: </span>
           <input type="password" value={apiKey} onChange={handleApiKeyChange} />
         </div>
-      <div className="laboratoryId">
+        <div className="laboratoryId">
           <span>Laboratory ID: </span>
-          <input type="text" value={laboratoryId} onChange={handleLaboratoryIdChange} />
+          <input
+            type="text"
+            value={laboratoryId}
+            onChange={handleLaboratoryIdChange}
+          />
         </div>
-      <div className="patientId">
+        <div className="patientId">
           <span>Patient ID: </span>
-          <input type="text" value={patientId} onChange={handlePatientIdChange} />
+          <input
+            type="text"
+            value={patientId}
+            onChange={handlePatientIdChange}
+          />
         </div>
       </div>
 
       <div className="fileInputs">
-        <div className="fileInput">
-          <h3 className="title">Normal R1:</h3>
-          <div className="uploadProgress">
-            <FileUpload
-              className="rawInput"
-              handleOnselect={handleFileSelect}
-            />
-            <p>Upload Progress: {progress === 0 ? "" : `${progress} %`}</p>
-          </div>
-          <label className="objectKey">
-            File key in the datalake: {objectKey}
-          </label>
-        </div>
+        <FileInputComponent
+          objectKey={objectKey}
+          progress={progress}
+          handleFileSelect={handleFileSelect}
+        />
       </div>
       <div className="controls">
-        <button
-          disabled={
-            file === undefined ||
-            progress > 0 ||
-            apiBaseUrl === "" ||
-            apiKey === "" || patientId === ""|| laboratoryId === ""
-          }
-          onClick={uploadFile}
-        >
-          Upload
-        </button>
-        <button onClick={cancelUpload}>Cancel</button>
+        <h3 className="title">Controls:</h3>
+        <div>
+          <button
+            disabled={
+              file === undefined ||
+              progress > 0 ||
+              apiBaseUrl === "" ||
+              apiKey === "" ||
+              patientId === "" ||
+              laboratoryId === ""
+            }
+            onClick={uploadFile}
+          >
+            Start Upload !
+          </button>
+          <button onClick={cancelUpload}>Cancel upload</button>
+        </div>
       </div>
     </div>
   );
