@@ -1,7 +1,6 @@
-import React, { useState } from "react";
 import "./App.css";
-import { Uploader } from "./utils/Uploader";
 import { FileInputComponent } from "./components/FileInputComponent";
+import { useFileUpload } from "./useFileUpload";
 import { useUploadParameters } from "./useUploadParameters";
 
 function App() {
@@ -18,61 +17,15 @@ function App() {
   } = useUploadParameters();
 
   // FILES TO UPLOAD
-  const [file, setFile] = useState<any>(undefined);
-  const [uploader, setUploader] = useState<any>(undefined);
-  const [progress, setProgress] = useState(0);
-  const [objectKey, setObjectKey] = useState<string>("");
-
-  const handleFileSelect = (files: FileList | null) => {
-    if (files) {
-      setFile(files[0]);
-    }
-  };
-
-  const uploadFile = () => {
-    if (file) {
-      let percentage: any = undefined;
-
-      const videoUploaderOptions = {
-        file: file,
-        apiBaseUrl: apiBaseUrl,
-        apiKey: apiKey,
-        patientId: patientId,
-        laboratoryId: laboratoryId,
-      };
-      const uploader = new Uploader(videoUploaderOptions);
-      setUploader(uploader);
-
-      uploader
-        .onProgress(({ percentage: newPercentage }: any) => {
-          // to avoid the same percentage to be logged twice
-          if (newPercentage !== percentage) {
-            percentage = newPercentage;
-            setProgress(percentage);
-            console.log("percentage", `${percentage}%`);
-          }
-        })
-        .onError((error: any) => {
-          setFile(undefined);
-          console.error(error);
-        })
-        .onCompleted((newObjectKey: string) => {
-          setObjectKey(newObjectKey);
-          console.log("newObjectKey", newObjectKey);
-        });
-
-      uploader.start();
-    }
-  };
-
-  const cancelUpload = () => {
-    if (uploader) {
-      uploader.abort();
-    }
-    setFile(undefined);
-    setObjectKey("");
-    setProgress(0);
-  };
+  const {
+    fileInputRef,
+    progress,
+    datalakeObjectKey,
+    handleFileSelect,
+    startUpload,
+    cancelUpload,
+    isFileUploadReadyToStart,
+  } = useFileUpload(apiBaseUrl, apiKey, patientId, laboratoryId);
 
   return (
     <div className="App">
@@ -110,21 +63,22 @@ function App() {
 
       <div className="fileInputs">
         <FileInputComponent
-          objectKey={objectKey}
+          objectKey={datalakeObjectKey}
           progress={progress}
           handleFileSelect={handleFileSelect}
+          fileInputRef={fileInputRef}
         />
       </div>
       <div className="controls">
         <h3 className="title">Controls:</h3>
         <div>
           <button
-            disabled={file === undefined || progress > 0 || !areParametersValid}
-            onClick={uploadFile}
+            disabled={!isFileUploadReadyToStart || !areParametersValid}
+            onClick={startUpload}
           >
             Start Upload !
           </button>
-          <button onClick={cancelUpload}>Cancel upload</button>
+          <button onClick={cancelUpload}>Cancel upload / Reset</button>
         </div>
       </div>
     </div>
