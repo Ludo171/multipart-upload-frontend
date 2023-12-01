@@ -19,23 +19,27 @@ function App() {
     areParametersValid,
   } = useUploadParameters();
 
-  const {
-    selectedFile,
-    fileInputRef,
-    progress,
-    datalakeObjectKey,
-    handleFileSelect,
-    startUpload,
-    cancelUpload,
-    isFileUploadReadyToStart,
-  } = useFileUpload();
+  const normalR1 = useFileUpload();
+  const normalR2 = useFileUpload();
+  const tumorR1 = useFileUpload();
+  const tumorR2 = useFileUpload();
 
-  const startAllFilesUpload = useAllFilesUpload({
+  const { startAllFilesUpload, cancelAllFileUploads } = useAllFilesUpload({
     apiClient,
     laboratoryId,
     patientId,
-    selectedFile1: selectedFile,
-    uploadFile1: startUpload,
+    normalR1File: normalR1.selectedFile,
+    uploadNormalR1: normalR1.startUpload,
+    cancelUploadNormalR1: normalR1.cancelUpload,
+    normalR2File: normalR2.selectedFile,
+    uploadNormalR2: normalR2.startUpload,
+    cancelUploadNormalR2: normalR2.cancelUpload,
+    tumorR1File: tumorR1.selectedFile,
+    uploadTumorR1: tumorR1.startUpload,
+    cancelUploadTumorR1: tumorR1.cancelUpload,
+    tumorR2File: tumorR2.selectedFile,
+    uploadTumorR2: tumorR2.startUpload,
+    cancelUploadTumorR2: tumorR2.cancelUpload,
   });
 
   return (
@@ -68,43 +72,49 @@ function App() {
       <div className="fileInputs">
         <FileInputComponent
           title="Normal R1 File:"
-          objectKey={datalakeObjectKey}
-          progress={progress}
-          handleFileSelect={handleFileSelect}
-          fileInputRef={fileInputRef}
+          objectKey={normalR1.datalakeObjectKey}
+          progress={normalR1.progress}
+          handleFileSelect={normalR1.handleFileSelect}
+          fileInputRef={normalR1.fileInputRef}
         />
         <FileInputComponent
           title="Normal R2 File:"
-          objectKey={""}
-          progress={0}
-          handleFileSelect={() => void 0}
-          fileInputRef={fileInputRef}
+          objectKey={normalR2.datalakeObjectKey}
+          progress={normalR2.progress}
+          handleFileSelect={normalR2.handleFileSelect}
+          fileInputRef={normalR2.fileInputRef}
         />
         <FileInputComponent
           title="Tumor R1 File:"
-          objectKey={""}
-          progress={0}
-          handleFileSelect={() => void 0}
-          fileInputRef={fileInputRef}
+          objectKey={tumorR1.datalakeObjectKey}
+          progress={tumorR1.progress}
+          handleFileSelect={tumorR1.handleFileSelect}
+          fileInputRef={tumorR1.fileInputRef}
         />
         <FileInputComponent
           title="Tumor R2 File:"
-          objectKey={""}
-          progress={0}
-          handleFileSelect={() => void 0}
-          fileInputRef={fileInputRef}
+          objectKey={tumorR2.datalakeObjectKey}
+          progress={tumorR2.progress}
+          handleFileSelect={tumorR2.handleFileSelect}
+          fileInputRef={tumorR2.fileInputRef}
         />
       </div>
       <div className="controls">
         <h3 className="title">Controls:</h3>
         <div>
           <button
-            disabled={!isFileUploadReadyToStart || !areParametersValid}
+            disabled={
+              !normalR1.isFileUploadReadyToStart ||
+              !normalR2.isFileUploadReadyToStart ||
+              !tumorR1.isFileUploadReadyToStart ||
+              !tumorR2.isFileUploadReadyToStart ||
+              !areParametersValid
+            }
             onClick={startAllFilesUpload}
           >
             Start Upload !
           </button>
-          <button onClick={cancelUpload}>Cancel upload / Reset</button>
+          <button onClick={cancelAllFileUploads}>Cancel upload / Reset</button>
         </div>
       </div>
     </div>
