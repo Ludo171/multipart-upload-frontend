@@ -1,17 +1,21 @@
 import { useCallback, useRef, useState } from "react";
 import { Uploader } from "./utils/Uploader";
+import { AxiosInstance } from "axios";
 
-export const useFileUpload = (
-  apiBaseUrl: string,
-  apiKey: string,
-  patientId: string,
-  laboratoryId: string
-) => {
+export type FileUploadInfo = {
+  uploadId: string;
+  objectKey: string;
+  partUploadUrls: string[];
+};
+
+export const useFileUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploader, setUploader] = useState<any>(undefined);
   const [progress, setProgress] = useState(0);
   const [datalakeObjectKey, setDatalakeObjectKey] = useState<string>("");
+
+  const isFileUploadReadyToStart = selectedFile !== undefined && progress === 0;
 
   const handleFileSelect = (files: FileList | null) => {
     if (files) {
@@ -19,41 +23,41 @@ export const useFileUpload = (
     }
   };
 
-  const startUpload = useCallback(() => {
-    if (selectedFile) {
-      let percentage: any = undefined;
+  const startUpload = useCallback(
+    (axiosInstance: AxiosInstance, fileUploadInfo: FileUploadInfo) => {
+      if (isFileUploadReadyToStart && selectedFile !== null) {
+        let percentage: any = undefined;
 
-      const videoUploaderOptions = {
-        file: selectedFile,
-        apiBaseUrl: apiBaseUrl,
-        apiKey: apiKey,
-        patientId: patientId,
-        laboratoryId: laboratoryId,
-      };
-      const uploader = new Uploader(videoUploaderOptions);
-      setUploader(uploader);
+        const uploaderOptions = {
+          file: selectedFile,
+          apiClient: axiosInstance,
+        };
+        const uploader = new Uploader(uploaderOptions);
+        setUploader(uploader);
 
-      uploader
-        .onProgress(({ percentage: newPercentage }: any) => {
-          // to avoid the same percentage to be logged twice
-          if (newPercentage !== percentage) {
-            percentage = newPercentage;
-            setProgress(percentage);
-            console.log("percentage", `${percentage}%`);
-          }
-        })
-        .onError((error: any) => {
-          setSelectedFile(null);
-          console.error(error);
-        })
-        .onCompleted((newDatalakeObjectKey: string) => {
-          setDatalakeObjectKey(newDatalakeObjectKey);
-          console.log("newDatalakeObjectKey", newDatalakeObjectKey);
-        });
+        uploader
+          .onProgress(({ percentage: newPercentage }: any) => {
+            // to avoid the same percentage to be logged twice
+            if (newPercentage !== percentage) {
+              percentage = newPercentage;
+              setProgress(percentage);
+              console.log("percentage", `${percentage}%`);
+            }
+          })
+          .onError((error: any) => {
+            setSelectedFile(null);
+            console.error(error);
+          })
+          .onCompleted((newDatalakeObjectKey: string) => {
+            setDatalakeObjectKey(newDatalakeObjectKey);
+            console.log("newDatalakeObjectKey", newDatalakeObjectKey);
+          });
 
-      uploader.start();
-    }
-  }, [selectedFile, apiBaseUrl, apiKey, patientId, laboratoryId]);
+        uploader.start(fileUploadInfo);
+      }
+    },
+    [isFileUploadReadyToStart, selectedFile]
+  );
 
   const cancelUpload = useCallback(() => {
     if (uploader) {
@@ -67,8 +71,6 @@ export const useFileUpload = (
     setProgress(0);
     setUploader(undefined);
   }, [uploader]);
-
-  const isFileUploadReadyToStart = selectedFile !== undefined && progress === 0;
 
   return {
     selectedFile,

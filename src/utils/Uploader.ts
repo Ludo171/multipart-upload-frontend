@@ -1,101 +1,62 @@
-import axios from "axios";
+import { AxiosInstance } from "axios";
 
-console.log(process.env?.REACT_APP_API_KEY);
+type UploaderOptions = {
+  file: File;
+  apiClient: AxiosInstance;
+};
 
-// original source: https://github.com/pilovm/multithreaded-uploader/blob/master/frontend/uploader.js
+type Part = {
+  signedUrl: string;
+  PartNumber: number;
+};
+type UploadedPart = {
+  PartNumber: number;
+  ETag: string;
+};
+
 export class Uploader {
-  chunkSize: any;
-  threadsQuantity: number;
-  file: any;
-  aborted: boolean;
-  uploadedSize: number;
-  progressCache: any;
-  activeConnections: any;
-  parts: any[];
-  uploadedParts: any[];
-  fileId: null;
-  fileKey: null;
-  api: any;
-  patientId: any;
-  laboratoryId:any
-  onProgressFn: (err: any) => void;
-  onErrorFn: (err: any) => void;
-  onCompletedFn: (objectKey: string) => void;
-  constructor(options: any) {
-    // this must be bigger than or equal to 5MB,
-    // otherwise AWS will respond with:
-    // "Your proposed upload is smaller than the minimum allowed size"
-    this.chunkSize = options.chunkSize || 1024 * 1024 * 5;
-    // number of parallel uploads
-    this.threadsQuantity = Math.min(options.threadsQuantity || 5, 15);
+  file: File;
+  apiClient: AxiosInstance;
+
+  chunkSize: number = 1000;
+  maxNumberOfThreads: number = 15;
+  aborted: boolean = false;
+  uploadedSize: number = 0;
+
+  parts: Part[] = [];
+  uploadedParts: UploadedPart[] = [];
+
+  progressCache: Record<number, number> = {};
+  activeConnections: Record<number, XMLHttpRequest> = {};
+
+  fileId: string | null = null;
+  fileKey: string | null = null;
+
+  onProgressFn: (err: any) => void = () => {};
+  onErrorFn: (err: any) => void = () => {};
+  onCompletedFn: (objectKey: string) => void = (objectKey: string) => {};
+
+  constructor(options: UploaderOptions) {
     this.file = options.file;
-    this.aborted = false;
-    this.uploadedSize = 0;
-    this.progressCache = {};
-    this.activeConnections = {};
-    this.parts = [];
-    this.uploadedParts = [];
-    this.fileId = null;
-    this.fileKey = null;
-    this.onProgressFn = () => {};
-    this.onErrorFn = () => {};
-    this.onCompletedFn = () => {};
-    this.patientId = options.patientId;
-    this.laboratoryId = options.laboratoryId
-
-    // initializing axios
-    this.api = axios.create({
-      baseURL: options.apiBaseUrl || "http://localhost:XXXX",
-      headers: {
-        "x-api-key": options.apiKey ?? "",
-        "Content-Type": "application/json",
-      },
-    });
+    this.apiClient = options.apiClient;
   }
 
-  // starting the multipart upload request
-  async start() {
-    this.initialize();
-
-    const checkApiCall = await this.api.request({
-      url: "health",
-      method: "GET",
-    });
-
-    console.log("checkApiCall", checkApiCall);
-  }
-
-  async initialize() {
+  async start({ uploadId, objectKey, partUploadUrls }: any) {
     try {
-      const payload = {
-        normalR1FileName: this.file.name,
-        normalR1FileSize: this.file.size,
-        laboratoryId: this.laboratoryId,
-        patientId: this.patientId
-      };
-      const urlsResponse = await this.api.request({
-        url: "biopsies/upload/get-presigned-urls",
-        method: "POST",
-        data: payload,
-      });
+      this.fileId = uploadId;
+      this.fileKey = objectKey;
 
-      this.fileId = urlsResponse.data.NormalR1.uploadId;
-      this.fileKey = urlsResponse.data.NormalR1.objectKey;
-
-      const numberOfparts =
-        urlsResponse.data.NormalR1.partUploadUrls.length ?? 5;
-
+      const numberOfparts = partUploadUrls.length;
       this.chunkSize = Math.ceil(this.file.size / numberOfparts);
 
       const newParts: any[] = [];
       for (let i = 0; i < numberOfparts; i++) {
         newParts.push({
-          signedUrl: urlsResponse.data.NormalR1.partUploadUrls[i],
+          signedUrl: partUploadUrls[i],
           PartNumber: i + 1,
         });
       }
       this.parts.push(...newParts);
-      console.log("this.parts", this.parts);
 
       this.sendNext();
     } catch (error) {
@@ -107,7 +68,7 @@ export class Uploader {
     const activeConnections = Object.keys(this.activeConnections).length;
     console.log("this.parts", this.parts);
 
-    if (activeConnections >= this.threadsQuantity) {
+    if (activeConnections >= this.maxNumberOfThreads) {
       return;
     }
 
@@ -119,7 +80,7 @@ export class Uploader {
       return;
     }
 
-    const part: any = this.parts.pop();
+    const part = this.parts.pop();
 
     if (this.file && part) {
       const sentSize = (part.PartNumber - 1) * this.chunkSize;
@@ -170,7 +131,7 @@ export class Uploader {
         parts: this.uploadedParts,
       };
 
-      const response = await this.api.request({
+      const response = await this.apiClient.request({
         url: "biopsies/upload/complete-multipart",
         method: "POST",
         data: videoFinalizationMultiPartInput,

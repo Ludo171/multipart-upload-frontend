@@ -1,12 +1,14 @@
 import "./App.css";
 import { FileInputComponent } from "./components/FileInputComponent";
-import { useFileUpload } from "./useFileUpload";
 import { useUploadParameters } from "./useUploadParameters";
+import { useAllFilesUpload } from "./useAllFilesUpload";
+import { useFileUpload } from "./useFileUpload";
 
 function App() {
   const {
     apiBaseUrl,
     apiKey,
+    apiClient,
     patientId,
     laboratoryId,
     handleApiBaseUrlChange,
@@ -16,8 +18,8 @@ function App() {
     areParametersValid,
   } = useUploadParameters();
 
-  // FILES TO UPLOAD
   const {
+    selectedFile,
     fileInputRef,
     progress,
     datalakeObjectKey,
@@ -25,7 +27,15 @@ function App() {
     startUpload,
     cancelUpload,
     isFileUploadReadyToStart,
-  } = useFileUpload(apiBaseUrl, apiKey, patientId, laboratoryId);
+  } = useFileUpload();
+
+  const startAllFilesUpload = useAllFilesUpload({
+    apiClient,
+    laboratoryId,
+    patientId,
+    selectedFile1: selectedFile,
+    uploadFile1: startUpload,
+  });
 
   return (
     <div className="App">
@@ -74,7 +84,7 @@ function App() {
         <div>
           <button
             disabled={!isFileUploadReadyToStart || !areParametersValid}
-            onClick={startUpload}
+            onClick={startAllFilesUpload}
           >
             Start Upload !
           </button>
