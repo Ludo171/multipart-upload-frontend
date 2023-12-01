@@ -1,147 +1,129 @@
-import React, { useState } from "react";
 import "./App.css";
-import FileUpload from "./components/FileUploadComponent";
-import { Uploader } from "./utils/Uploader";
+import { FileInputComponent } from "./components/FileInputComponent";
+import { useUploadParameters } from "./useUploadParameters";
+import { useAllFilesUpload } from "./useAllFilesUpload";
+import { useFileUpload } from "./useFileUpload";
+import { ParamInputComponent } from "./components/ParamInputComponent";
 
 function App() {
-  const [file, setFile] = useState<any>(undefined);
-  const [uploader, setUploader] = useState<any>(undefined);
-  const [progress, setProgress] = useState(0);
-  const [apiBaseUrl, setApiBaseUrl] = useState<string>(
-    process.env.REACT_APP_API_BASE_URL ?? ""
-  );
-  const [apiKey, setApiKey] = useState<string>("");
-  const [objectKey, setObjectKey] = useState<string>("");
-  const [patientId, setPatientId] = useState<string>("");
-  const [laboratoryId, setLaboratoryId] = useState<string>("");
+  const {
+    apiClient,
+    apiBaseUrl,
+    apiKey,
+    laboratoryId,
+    patientId,
+    biopsyId,
+    handleApiBaseUrlChange,
+    handleApiKeyChange,
+    handleLaboratoryIdChange,
+    handlePatientIdChange,
+    handleBiopsyIdChange,
+    areParametersValid,
+  } = useUploadParameters();
 
+  const normalR1 = useFileUpload();
+  const normalR2 = useFileUpload();
+  const tumorR1 = useFileUpload();
+  const tumorR2 = useFileUpload();
 
-  const handleApiBaseUrlChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setApiBaseUrl(event.target.value);
-  };
-
-  const handleApiKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setApiKey(event.target.value);
-  };
-  const handlePatientIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPatientId(event.target.value);
-  };
-  const handleLaboratoryIdChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setLaboratoryId(event.target.value);
-  };
-
-
-  const handleFileSelect = (files: FileList | null) => {
-    if (files) {
-      setFile(files[0]);
-    }
-  };
-
-  const uploadFile = () => {
-    if (file) {
-      console.log(file);
-
-      let percentage: any = undefined;
-
-      const videoUploaderOptions = {
-        file: file,
-        apiBaseUrl: apiBaseUrl,
-        apiKey: apiKey,
-        patientId: patientId,
-        laboratoryId: laboratoryId
-      };
-      const uploader = new Uploader(videoUploaderOptions);
-      setUploader(uploader);
-
-      uploader
-        .onProgress(({ percentage: newPercentage }: any) => {
-          // to avoid the same percentage to be logged twice
-          if (newPercentage !== percentage) {
-            percentage = newPercentage;
-            setProgress(percentage);
-            console.log("percentage", `${percentage}%`);
-          }
-        })
-        .onError((error: any) => {
-          setFile(undefined);
-          console.error(error);
-        })
-        .onCompleted((newObjectKey: string) => {
-          setObjectKey(newObjectKey);
-          console.log("newObjectKey", newObjectKey);
-        });
-
-      uploader.start();
-    }
-  };
-
-  const cancelUpload = () => {
-    if (uploader) {
-      uploader.abort();
-    }
-    setFile(undefined);
-    setObjectKey("");
-    setProgress(0);
-  };
+  const { startAllFilesUpload, cancelAllFileUploads } = useAllFilesUpload({
+    apiClient,
+    laboratoryId,
+    patientId,
+    biopsyId,
+    normalR1File: normalR1.selectedFile,
+    uploadNormalR1: normalR1.startUpload,
+    cancelUploadNormalR1: normalR1.cancelUpload,
+    normalR2File: normalR2.selectedFile,
+    uploadNormalR2: normalR2.startUpload,
+    cancelUploadNormalR2: normalR2.cancelUpload,
+    tumorR1File: tumorR1.selectedFile,
+    uploadTumorR1: tumorR1.startUpload,
+    cancelUploadTumorR1: tumorR1.cancelUpload,
+    tumorR2File: tumorR2.selectedFile,
+    uploadTumorR2: tumorR2.startUpload,
+    cancelUploadTumorR2: tumorR2.cancelUpload,
+  });
 
   return (
     <div className="App">
       <h1>PoC MSInsight - File Upload Form</h1>
-      <div className="apiSettings">
-        <div className="url">
-          <span>API Base URL: </span>
-          <input
-            type="text"
-            value={apiBaseUrl}
-            onChange={handleApiBaseUrlChange}
-          />
-        </div>
-        <div className="key">
-          <span>API Key: </span>
-          <input type="password" value={apiKey} onChange={handleApiKeyChange} />
-        </div>
-      <div className="laboratoryId">
-          <span>Laboratory ID: </span>
-          <input type="text" value={laboratoryId} onChange={handleLaboratoryIdChange} />
-        </div>
-      <div className="patientId">
-          <span>Patient ID: </span>
-          <input type="text" value={patientId} onChange={handlePatientIdChange} />
-        </div>
+      <div className="params">
+        <h3 className="title">Parameters:</h3>
+        <ParamInputComponent
+          title="Base API Url:"
+          value={apiBaseUrl}
+          handleValueChange={handleApiBaseUrlChange}
+        />
+        <ParamInputComponent
+          title="API Key:"
+          value={apiKey}
+          handleValueChange={handleApiKeyChange}
+          type="password"
+        />
+        <ParamInputComponent
+          title="Laboratory ID:"
+          value={laboratoryId}
+          handleValueChange={handleLaboratoryIdChange}
+        />
+        <ParamInputComponent
+          title="Patient ID:"
+          value={patientId}
+          handleValueChange={handlePatientIdChange}
+        />
+        <ParamInputComponent
+          title="Biopsy ID:"
+          value={biopsyId}
+          handleValueChange={handleBiopsyIdChange}
+        />
       </div>
-
       <div className="fileInputs">
-        <div className="fileInput">
-          <h3 className="title">Normal R1:</h3>
-          <div className="uploadProgress">
-            <FileUpload
-              className="rawInput"
-              handleOnselect={handleFileSelect}
-            />
-            <p>Upload Progress: {progress === 0 ? "" : `${progress} %`}</p>
-          </div>
-          <label className="objectKey">
-            File key in the datalake: {objectKey}
-          </label>
-        </div>
+        <FileInputComponent
+          title="Normal R1 File:"
+          objectKey={normalR1.datalakeObjectKey}
+          progress={normalR1.progress}
+          handleFileSelect={normalR1.handleFileSelect}
+          fileInputRef={normalR1.fileInputRef}
+        />
+        <FileInputComponent
+          title="Normal R2 File:"
+          objectKey={normalR2.datalakeObjectKey}
+          progress={normalR2.progress}
+          handleFileSelect={normalR2.handleFileSelect}
+          fileInputRef={normalR2.fileInputRef}
+        />
+        <FileInputComponent
+          title="Tumor R1 File:"
+          objectKey={tumorR1.datalakeObjectKey}
+          progress={tumorR1.progress}
+          handleFileSelect={tumorR1.handleFileSelect}
+          fileInputRef={tumorR1.fileInputRef}
+        />
+        <FileInputComponent
+          title="Tumor R2 File:"
+          objectKey={tumorR2.datalakeObjectKey}
+          progress={tumorR2.progress}
+          handleFileSelect={tumorR2.handleFileSelect}
+          fileInputRef={tumorR2.fileInputRef}
+        />
       </div>
       <div className="controls">
-        <button
-          disabled={
-            file === undefined ||
-            progress > 0 ||
-            apiBaseUrl === "" ||
-            apiKey === "" || patientId === ""|| laboratoryId === ""
-          }
-          onClick={uploadFile}
-        >
-          Upload
-        </button>
-        <button onClick={cancelUpload}>Cancel</button>
+        <h3 className="title">Controls:</h3>
+        <div>
+          <button
+            disabled={
+              !normalR1.isFileUploadReadyToStart ||
+              !normalR2.isFileUploadReadyToStart ||
+              !tumorR1.isFileUploadReadyToStart ||
+              !tumorR2.isFileUploadReadyToStart ||
+              !areParametersValid
+            }
+            onClick={startAllFilesUpload}
+          >
+            Start Upload !
+          </button>
+          <button onClick={cancelAllFileUploads}>Cancel upload / Reset</button>
+        </div>
       </div>
     </div>
   );

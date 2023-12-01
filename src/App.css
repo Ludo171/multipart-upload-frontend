@@ -2,29 +2,53 @@
   padding-top: 2%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 50px;
+  gap: 30px;
   padding: 50px;
 }
 
-.apiSettings {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 5px;
+p {
+  margin: 0;
+  padding: 0;
 }
 
-.apiSettings > span {
-  min-width: 100px;
+.title {
+  text-decoration: underline;
+  margin-top: 0;
+  margin-bottom: 15px;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.params {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.params .title {
+  margin-bottom: 0;
+}
+
+
+.paramInput {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5px;
+}
+.paramInput > span {
+  min-width: 150px;
+}
+.paramInput > input {
+  min-width: 300px;
 }
 
 .fileInputs {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 50px;
+  gap: 20px;
 }
 
 .fileInput {
@@ -36,9 +60,6 @@
   gap: 5px;
 }
 
-.fileInput .title {
-  text-decoration: underline;
-}
 
 .fileInput .uploadProgress {
   display: flex;
@@ -55,4 +76,18 @@
 .fileInput .objectKey {
   text-align: left;
   text-wrap: wrap;
+}
+
+.controls {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.controls div {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
 }
