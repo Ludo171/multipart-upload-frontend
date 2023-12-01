@@ -45,9 +45,9 @@ function App() {
         <h3 className="title">Parameters:</h3>
         <ParamInputComponent
           title="Base API Url:"
-            value={apiBaseUrl}
+          value={apiBaseUrl}
           handleValueChange={handleApiBaseUrlChange}
-          />
+        />
         <ParamInputComponent
           title="API Key:"
           value={apiKey}
@@ -56,20 +56,42 @@ function App() {
         />
         <ParamInputComponent
           title="Laboratory ID:"
-            value={laboratoryId}
+          value={laboratoryId}
           handleValueChange={handleLaboratoryIdChange}
-          />
+        />
         <ParamInputComponent
           title="Patient ID:"
-            value={patientId}
+          value={patientId}
           handleValueChange={handlePatientIdChange}
-          />
+        />
       </div>
       <div className="fileInputs">
         <FileInputComponent
+          title="Normal R1 File:"
           objectKey={datalakeObjectKey}
           progress={progress}
           handleFileSelect={handleFileSelect}
+          fileInputRef={fileInputRef}
+        />
+        <FileInputComponent
+          title="Normal R2 File:"
+          objectKey={""}
+          progress={0}
+          handleFileSelect={() => void 0}
+          fileInputRef={fileInputRef}
+        />
+        <FileInputComponent
+          title="Tumor R1 File:"
+          objectKey={""}
+          progress={0}
+          handleFileSelect={() => void 0}
+          fileInputRef={fileInputRef}
+        />
+        <FileInputComponent
+          title="Tumor R2 File:"
+          objectKey={""}
+          progress={0}
+          handleFileSelect={() => void 0}
           fileInputRef={fileInputRef}
         />
       </div>

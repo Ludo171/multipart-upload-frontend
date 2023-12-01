@@ -1,6 +1,7 @@
 import { ChangeEvent, RefObject } from "react";
 
 type FileInputProps = {
+  title: string;
   objectKey: string;
   progress: number;
   handleFileSelect: (e: FileList | null) => void;
@@ -8,6 +9,7 @@ type FileInputProps = {
 };
 
 export const FileInputComponent = ({
+  title,
   objectKey,
   progress,
   handleFileSelect,
@@ -15,7 +17,7 @@ export const FileInputComponent = ({
 }: FileInputProps) => {
   return (
     <div className="fileInput">
-      <h3 className="title">Normal R1:</h3>
+      <h3 className="title">{title}</h3>
       <div className="uploadProgress">
         <input
           className="rawInput"
