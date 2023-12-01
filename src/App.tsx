@@ -3,6 +3,7 @@ import { FileInputComponent } from "./components/FileInputComponent";
 import { useUploadParameters } from "./useUploadParameters";
 import { useAllFilesUpload } from "./useAllFilesUpload";
 import { useFileUpload } from "./useFileUpload";
+import { ParamInputComponent } from "./components/ParamInputComponent";
 
 function App() {
   const {
@@ -40,37 +41,30 @@ function App() {
   return (
     <div className="App">
       <h1>PoC MSInsight - File Upload Form</h1>
-      <div className="apiSettings">
-        <div className="url">
-          <span>API Base URL: </span>
-          <input
-            type="text"
+      <div className="params">
+        <h3 className="title">Parameters:</h3>
+        <ParamInputComponent
+          title="Base API Url:"
             value={apiBaseUrl}
-            onChange={handleApiBaseUrlChange}
+          handleValueChange={handleApiBaseUrlChange}
           />
-        </div>
-        <div>
-          <span>API Key: </span>
-          <input type="password" value={apiKey} onChange={handleApiKeyChange} />
-        </div>
-        <div className="laboratoryId">
-          <span>Laboratory ID: </span>
-          <input
-            type="text"
+        <ParamInputComponent
+          title="API Key:"
+          value={apiKey}
+          handleValueChange={handleApiKeyChange}
+          type="password"
+        />
+        <ParamInputComponent
+          title="Laboratory ID:"
             value={laboratoryId}
-            onChange={handleLaboratoryIdChange}
+          handleValueChange={handleLaboratoryIdChange}
           />
-        </div>
-        <div className="patientId">
-          <span>Patient ID: </span>
-          <input
-            type="text"
+        <ParamInputComponent
+          title="Patient ID:"
             value={patientId}
-            onChange={handlePatientIdChange}
+          handleValueChange={handlePatientIdChange}
           />
-        </div>
       </div>
-
       <div className="fileInputs">
         <FileInputComponent
           objectKey={datalakeObjectKey}
