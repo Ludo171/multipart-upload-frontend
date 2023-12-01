@@ -7,15 +7,17 @@ import { ParamInputComponent } from "./components/ParamInputComponent";
 
 function App() {
   const {
+    apiClient,
     apiBaseUrl,
     apiKey,
-    apiClient,
-    patientId,
     laboratoryId,
+    patientId,
+    biopsyId,
     handleApiBaseUrlChange,
     handleApiKeyChange,
     handleLaboratoryIdChange,
     handlePatientIdChange,
+    handleBiopsyIdChange,
     areParametersValid,
   } = useUploadParameters();
 
@@ -28,6 +30,7 @@ function App() {
     apiClient,
     laboratoryId,
     patientId,
+    biopsyId,
     normalR1File: normalR1.selectedFile,
     uploadNormalR1: normalR1.startUpload,
     cancelUploadNormalR1: normalR1.cancelUpload,
@@ -67,6 +70,11 @@ function App() {
           title="Patient ID:"
           value={patientId}
           handleValueChange={handlePatientIdChange}
+        />
+        <ParamInputComponent
+          title="Biopsy ID:"
+          value={biopsyId}
+          handleValueChange={handleBiopsyIdChange}
         />
       </div>
       <div className="fileInputs">

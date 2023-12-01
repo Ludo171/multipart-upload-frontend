@@ -8,9 +8,10 @@ type UploadFileFunction = (
 ) => void;
 
 type AllFilesUploadInput = {
+  apiClient: AxiosInstance;
   laboratoryId: string;
   patientId: string;
-  apiClient: any;
+  biopsyId: string;
   normalR1File: File | null;
   uploadNormalR1: UploadFileFunction;
   cancelUploadNormalR1: () => void;
@@ -26,9 +27,10 @@ type AllFilesUploadInput = {
 };
 
 export const useAllFilesUpload = ({
+  apiClient,
   laboratoryId,
   patientId,
-  apiClient,
+  biopsyId,
   normalR1File,
   uploadNormalR1,
   cancelUploadNormalR1,
@@ -46,6 +48,7 @@ export const useAllFilesUpload = ({
     const payload = {
       laboratoryId: laboratoryId,
       patientId: patientId,
+      biopsyId: biopsyId,
       normalR1FileName: normalR1File?.name,
       normalR1FileSize: normalR1File?.size,
       normalR2FileName: normalR2File?.name,
@@ -71,8 +74,10 @@ export const useAllFilesUpload = ({
     uploadTumorR1(apiClient, TumorR1UploadInfo);
     uploadTumorR2(apiClient, TumorR2UploadInfo);
   }, [
+    apiClient,
     laboratoryId,
     patientId,
+    biopsyId,
     normalR1File?.name,
     normalR1File?.size,
     normalR2File?.name,
@@ -81,7 +86,6 @@ export const useAllFilesUpload = ({
     tumorR1File?.size,
     tumorR2File?.name,
     tumorR2File?.size,
-    apiClient,
     uploadNormalR1,
     uploadNormalR2,
     uploadTumorR1,

@@ -2,7 +2,6 @@
   padding-top: 2%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 30px;
   padding: 50px;
 }
@@ -40,6 +39,9 @@ p {
 }
 .paramInput > span {
   min-width: 150px;
+}
+.paramInput > input {
+  min-width: 300px;
 }
 
 .fileInputs {
