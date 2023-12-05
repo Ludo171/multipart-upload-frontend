@@ -8,7 +8,7 @@ export type FileUploadInfo = {
   partUploadUrls: string[];
 };
 
-export const useOneBiopsyFileUpload = () => {
+export const useOneBiopsyFileUpload = ({onUploadCompleted} : {onUploadCompleted : ()=>void }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploader, setUploader] = useState<any>(undefined);
@@ -51,12 +51,13 @@ export const useOneBiopsyFileUpload = () => {
           .onCompleted((newDatalakeObjectKey: string) => {
             setDatalakeObjectKey(newDatalakeObjectKey);
             console.log("newDatalakeObjectKey", newDatalakeObjectKey);
+            onUploadCompleted();
           });
 
         uploader.start(fileUploadInfo);
       }
     },
-    [isFileUploadReadyToStart, selectedFile]
+    [isFileUploadReadyToStart, selectedFile, onUploadCompleted]
   );
 
   const cancelUpload = useCallback(() => {

@@ -4,6 +4,7 @@ import { useUploadParameters } from "./useUploadParameters";
 import { useFullBiopsyUpload } from "./useFullBiopsyUpload";
 import { useOneBiopsyFileUpload } from "./useOneBiopsyFileUpload";
 import { ParamInputComponent } from "./components/ParamInputComponent";
+import { useCreateAnalysisAfterBiopsyUpload } from "./useCreateAnalysisAfterBiopsyUpload";
 
 function App() {
   const {
@@ -21,11 +22,12 @@ function App() {
     areParametersValid,
   } = useUploadParameters();
 
+  const {handleFileUploadCompletion} = useCreateAnalysisAfterBiopsyUpload({apiClient, laboratoryId, patientId, biopsyId});
 
-  const normalR1 = useOneBiopsyFileUpload();
-  const normalR2 = useOneBiopsyFileUpload();
-  const tumorR1 = useOneBiopsyFileUpload();
-  const tumorR2 = useOneBiopsyFileUpload();
+  const normalR1 = useOneBiopsyFileUpload({onUploadCompleted: handleFileUploadCompletion});
+  const normalR2 = useOneBiopsyFileUpload({onUploadCompleted: handleFileUploadCompletion});
+  const tumorR1 = useOneBiopsyFileUpload({onUploadCompleted: handleFileUploadCompletion});
+  const tumorR2 = useOneBiopsyFileUpload({onUploadCompleted: handleFileUploadCompletion});
 
   const { startAllFilesUpload, cancelAllFileUploads } = useFullBiopsyUpload({
     apiClient,
