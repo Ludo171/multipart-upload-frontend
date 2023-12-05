@@ -14,7 +14,12 @@ export const useCreateAnalysisAfterBiopsyUpload =  ({apiClient, laboratoryId, pa
         } 
     }
 
+    const reinitializeNbOfUploadedBiopsyFiles = ()=>{
+        nbOfUploadedBiopsyFilesRef.current =0
+    }
+
     return {
       handleFileUploadCompletion,
+      reinitializeNbOfUploadedBiopsyFiles
     };
 };

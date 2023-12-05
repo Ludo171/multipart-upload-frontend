@@ -22,7 +22,7 @@ function App() {
     areParametersValid,
   } = useUploadParameters();
 
-  const {handleFileUploadCompletion} = useCreateAnalysisAfterBiopsyUpload({apiClient, laboratoryId, patientId, biopsyId});
+  const {handleFileUploadCompletion, reinitializeNbOfUploadedBiopsyFiles} = useCreateAnalysisAfterBiopsyUpload({apiClient, laboratoryId, patientId, biopsyId});
 
   const normalR1 = useOneBiopsyFileUpload({onUploadCompleted: handleFileUploadCompletion});
   const normalR2 = useOneBiopsyFileUpload({onUploadCompleted: handleFileUploadCompletion});
@@ -46,6 +46,7 @@ function App() {
     tumorR2File: tumorR2.selectedFile,
     uploadTumorR2: tumorR2.startUpload,
     cancelUploadTumorR2: tumorR2.cancelUpload,
+    reinitializeNbOfUploadedBiopsyFiles,
   });
 
   return (

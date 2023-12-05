@@ -24,6 +24,7 @@ type AllFilesUploadInput = {
   tumorR2File: File | null;
   uploadTumorR2: UploadFileFunction;
   cancelUploadTumorR2: () => void;
+  reinitializeNbOfUploadedBiopsyFiles: () => void;
 };
 
 export const useFullBiopsyUpload = ({
@@ -43,6 +44,7 @@ export const useFullBiopsyUpload = ({
   tumorR2File,
   uploadTumorR2,
   cancelUploadTumorR2,
+  reinitializeNbOfUploadedBiopsyFiles,
 }: AllFilesUploadInput) => {
   const startAllFilesUpload = useCallback(async () => {
     const payload = {
@@ -97,11 +99,13 @@ export const useFullBiopsyUpload = ({
     cancelUploadNormalR2();
     cancelUploadTumorR1();
     cancelUploadTumorR2();
+    reinitializeNbOfUploadedBiopsyFiles();
   }, [
     cancelUploadNormalR1,
     cancelUploadNormalR2,
     cancelUploadTumorR1,
     cancelUploadTumorR2,
+    reinitializeNbOfUploadedBiopsyFiles,
   ]);
 
   return { startAllFilesUpload, cancelAllFileUploads };
