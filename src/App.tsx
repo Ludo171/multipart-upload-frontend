@@ -1,8 +1,8 @@
 import "./App.css";
 import { FileInputComponent } from "./components/FileInputComponent";
 import { useUploadParameters } from "./useUploadParameters";
-import { useAllFilesUpload } from "./useAllFilesUpload";
-import { useFileUpload } from "./useFileUpload";
+import { useFullBiopsyUpload } from "./useFullBiopsyUpload";
+import { useOneBiopsyFileUpload } from "./useOneBiopsyFileUpload";
 import { ParamInputComponent } from "./components/ParamInputComponent";
 
 function App() {
@@ -21,12 +21,13 @@ function App() {
     areParametersValid,
   } = useUploadParameters();
 
-  const normalR1 = useFileUpload();
-  const normalR2 = useFileUpload();
-  const tumorR1 = useFileUpload();
-  const tumorR2 = useFileUpload();
 
-  const { startAllFilesUpload, cancelAllFileUploads } = useAllFilesUpload({
+  const normalR1 = useOneBiopsyFileUpload();
+  const normalR2 = useOneBiopsyFileUpload();
+  const tumorR1 = useOneBiopsyFileUpload();
+  const tumorR2 = useOneBiopsyFileUpload();
+
+  const { startAllFilesUpload, cancelAllFileUploads } = useFullBiopsyUpload({
     apiClient,
     laboratoryId,
     patientId,

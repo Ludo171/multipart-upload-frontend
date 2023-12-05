@@ -8,7 +8,7 @@ export type FileUploadInfo = {
   partUploadUrls: string[];
 };
 
-export const useFileUpload = () => {
+export const useOneBiopsyFileUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploader, setUploader] = useState<any>(undefined);
@@ -41,7 +41,7 @@ export const useFileUpload = () => {
             if (newPercentage !== percentage) {
               percentage = newPercentage;
               setProgress(percentage);
-              console.log("percentage", `${percentage}%`);
+              //console.log("percentage", `${percentage}%`);
             }
           })
           .onError((error: any) => {

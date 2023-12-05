@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { FileUploadInfo } from "./useFileUpload";
+import { FileUploadInfo } from "./useOneBiopsyFileUpload";
 import { AxiosInstance } from "axios";
 
 type UploadFileFunction = (
@@ -26,7 +26,7 @@ type AllFilesUploadInput = {
   cancelUploadTumorR2: () => void;
 };
 
-export const useAllFilesUpload = ({
+export const useFullBiopsyUpload = ({
   apiClient,
   laboratoryId,
   patientId,
