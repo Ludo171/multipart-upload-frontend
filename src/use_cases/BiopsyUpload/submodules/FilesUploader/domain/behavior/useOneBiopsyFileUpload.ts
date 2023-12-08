@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { Uploader } from "./utils/Uploader";
+import { Uploader } from "./upload.service";
 import { AxiosInstance } from "axios";
 
 export type FileUploadInfo = {
@@ -8,7 +8,11 @@ export type FileUploadInfo = {
   partUploadUrls: string[];
 };
 
-export const useOneBiopsyFileUpload = ({onUploadCompleted} : {onUploadCompleted : ()=>void }) => {
+export const useOneBiopsyFileUpload = ({
+  onUploadCompleted,
+}: {
+  onUploadCompleted: () => void;
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploader, setUploader] = useState<any>(undefined);

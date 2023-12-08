@@ -116,8 +116,8 @@ export class Uploader {
 
     try {
       await this.sendCompleteRequest();
-        console.log(this.fileKey);
-        this.onCompletedFn(this.fileKey ?? "unknown object key");
+      console.log(this.fileKey);
+      this.onCompletedFn(this.fileKey ?? "unknown object key");
     } catch (error) {
       this.onErrorFn(error);
     }
@@ -178,9 +178,9 @@ export class Uploader {
         delete this.progressCache[part];
       }
 
-        const inProgress = Object.keys(this.progressCache)
-          .map(Number)
-          .reduce((memo, id) => (memo += this.progressCache[id]), 0);
+      const inProgress = Object.keys(this.progressCache)
+        .map(Number)
+        .reduce((memo, id) => (memo += this.progressCache[id]), 0);
 
       const sent = Math.min(this.uploadedSize + inProgress, this.file.size);
 
@@ -193,7 +193,6 @@ export class Uploader {
         total: total,
         percentage: percentage,
       });
-
     }
   }
 
