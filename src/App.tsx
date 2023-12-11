@@ -1,8 +1,16 @@
-import "./App.css";
-import NewBiopsyPage from "./use_cases/BiopsyUpload/ui_components/UploadBiopsyPage";
+import * as React from "react";
+import "./App.style.css";
+import { RouterProvider } from "react-router-dom";
+import { AuthProvider } from "./cross_project/auth/AuthProvider";
+import { router } from "./cross_project/router/router";
+import { ApiClientProvider } from "./cross_project/api_client/ApiClientProvider";
 
-function App() {
-  return <NewBiopsyPage />;
-}
+const App = () => (
+  <ApiClientProvider>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  </ApiClientProvider>
+);
 
 export default App;
