@@ -3,10 +3,9 @@ import {
   FileUploadInfo,
   useOneBiopsyFileUpload,
 } from "./useOneBiopsyFileUpload";
-import { AxiosInstance } from "axios";
+import { useGetPresignedUploadUrls } from "../../db_integration/useGetPresignedUploadUrls";
 
 type AllFilesUploadInput = {
-  apiClient: AxiosInstance;
   laboratoryId: string;
   patientId: string;
   biopsyId: string;
@@ -14,7 +13,6 @@ type AllFilesUploadInput = {
 };
 
 export const useFullBiopsyUpload = ({
-  apiClient,
   laboratoryId,
   patientId,
   biopsyId,
@@ -43,37 +41,30 @@ export const useFullBiopsyUpload = ({
     onUploadCompleted: handleFileUploadCompletion,
   });
 
+  const getPresignedUploadUrls = useGetPresignedUploadUrls();
+
   const startAllFilesUpload = useCallback(async () => {
-    const payload = {
-      laboratoryId: laboratoryId,
-      patientId: patientId,
-      biopsyId: biopsyId,
-      normalR1FileName: normalR1.selectedFile?.name,
-      normalR1FileSize: normalR1.selectedFile?.size,
-      normalR2FileName: normalR2.selectedFile?.name,
-      normalR2FileSize: normalR2.selectedFile?.size,
-      tumorR1FileName: tumorR1.selectedFile?.name,
-      tumorR1FileSize: tumorR1.selectedFile?.size,
-      tumorR2FileName: tumorR2.selectedFile?.name,
-      tumorR2FileSize: tumorR2.selectedFile?.size,
-    };
-    const { data: filesUploadUrls } = await apiClient.request({
-      url: "biopsies/upload/get-presigned-urls",
-      method: "POST",
-      data: payload,
-    });
+    const filesUploadUrls = await getPresignedUploadUrls(
+      laboratoryId,
+      patientId,
+      biopsyId,
+      normalR1.selectedFile,
+      normalR2.selectedFile,
+      tumorR1.selectedFile,
+      tumorR2.selectedFile
+    );
 
     const NormalR1UploadInfo: FileUploadInfo = filesUploadUrls.NormalR1;
     const NormalR2UploadInfo: FileUploadInfo = filesUploadUrls.NormalR2;
     const TumorR1UploadInfo: FileUploadInfo = filesUploadUrls.TumorR1;
     const TumorR2UploadInfo: FileUploadInfo = filesUploadUrls.TumorR2;
 
-    normalR1.startUpload(apiClient, NormalR1UploadInfo);
-    normalR2.startUpload(apiClient, NormalR2UploadInfo);
-    tumorR1.startUpload(apiClient, TumorR1UploadInfo);
-    tumorR2.startUpload(apiClient, TumorR2UploadInfo);
+    normalR1.startUpload(NormalR1UploadInfo);
+    normalR2.startUpload(NormalR2UploadInfo);
+    tumorR1.startUpload(TumorR1UploadInfo);
+    tumorR2.startUpload(TumorR2UploadInfo);
   }, [
-    apiClient,
+    getPresignedUploadUrls,
     laboratoryId,
     patientId,
     biopsyId,

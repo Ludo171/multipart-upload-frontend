@@ -1,17 +1,14 @@
 import { AxiosInstance } from "axios";
 
 export type CreateAnalysisInput = {
-  apiClient: AxiosInstance;
   laboratoryId: string;
   patientId: string;
   biopsyId: string;
 };
-export const createAnalysis = async ({
-  apiClient,
-  laboratoryId,
-  patientId,
-  biopsyId,
-}: CreateAnalysisInput) => {
+export const createAnalysis = async (
+  apiClient: AxiosInstance,
+  { laboratoryId, patientId, biopsyId }: CreateAnalysisInput
+) => {
   const payload = {
     laboratoryId: laboratoryId,
     patientId: patientId,

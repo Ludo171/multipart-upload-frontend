@@ -2,32 +2,22 @@ import "./UploadBiopsyPage.style.css";
 import { UploadParamsForm } from "../submodules/UploadParams/ui_components/UploadParamsForm";
 import { useUploadParameters } from "../submodules/UploadParams/domain/behavior/useUploadParameters";
 import { useFullBiopsyUpload } from "../submodules/FilesUploader/domain/behavior/useFullBiopsyUpload";
-import { useCreateAnalysis } from "../domain/behaviour/useCreateAnalysis";
 import { BiopsyFilesSelector } from "../submodules/FilesUploader/ui_components/BiopsyFilesSelector";
 import { BiopsyUploadControls } from "../submodules/FilesUploader/ui_components/BiopsyUploadControls";
+import { useCreateAnalysis } from "../db_integration/useCreateAnalysis";
 
 function NewBiopsyPage() {
   const {
-    apiClient,
-    apiBaseUrl,
-    apiKey,
     laboratoryId,
     patientId,
     biopsyId,
-    handleApiBaseUrlChange,
-    handleApiKeyChange,
     handleLaboratoryIdChange,
     handlePatientIdChange,
     handleBiopsyIdChange,
     areParametersValid,
   } = useUploadParameters();
 
-  const createAnalysis = useCreateAnalysis({
-    apiClient,
-    laboratoryId,
-    patientId,
-    biopsyId,
-  });
+  const createAnalysis = useCreateAnalysis();
 
   const {
     normalR1,
@@ -38,24 +28,24 @@ function NewBiopsyPage() {
     startAllFilesUpload,
     cancelAllFileUploads,
   } = useFullBiopsyUpload({
-    apiClient,
     laboratoryId,
     patientId,
     biopsyId,
-    onUploadCompleted: createAnalysis,
+    onUploadCompleted: () =>
+      createAnalysis({
+        laboratoryId,
+        patientId,
+        biopsyId,
+      }),
   });
 
   return (
-    <div className="App">
-      <h1>PoC MSInsight - File Upload Form</h1>
+    <div className="page">
+      <h2>Upload a new biopsy (and start an analysis automatically)</h2>
       <UploadParamsForm
-        apiBaseUrl={apiBaseUrl}
-        apiKey={apiKey}
         laboratoryId={laboratoryId}
         patientId={patientId}
         biopsyId={biopsyId}
-        handleApiBaseUrlChange={handleApiBaseUrlChange}
-        handleApiKeyChange={handleApiKeyChange}
         handleLaboratoryIdChange={handleLaboratoryIdChange}
         handlePatientIdChange={handlePatientIdChange}
         handleBiopsyIdChange={handleBiopsyIdChange}
