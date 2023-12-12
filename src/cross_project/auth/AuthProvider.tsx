@@ -1,32 +1,93 @@
-import React, { createContext } from "react";
-import { mockAuthService } from "./mockAuth.service";
+import React, { createContext, useEffect } from "react";
+import {
+  loginWithCognito,
+  logoutWithCognito,
+  updateAuthConfig,
+} from "./auth.service";
 import { User } from "./User.type";
+import { getCurrentUser } from "aws-amplify/auth";
 
 type AuthContextType = {
+  isAuthConfigured: boolean;
+  setAuthConfig: (config: {
+    userPoolId: string;
+    userPoolClientId: string;
+  }) => void;
   user: User | null;
-  login: () => void;
+  isLoggedIn: boolean;
+  shouldResetPassword: boolean;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType>({
+  isAuthConfigured: false,
+  setAuthConfig: () => {},
   user: null,
-  login: () => {},
+  isLoggedIn: false,
+  shouldResetPassword: false,
+  login: async () => false,
   logout: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: JSX.Element }) => {
+  const [isAuthConfigured, setIsAuthConfigureed] = React.useState(false);
   const [user, setUser] = React.useState<User | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [shouldResetPassword, setShouldResetPassword] = React.useState(false);
 
-  const login = async () => {
-    console.log("login");
-    const user = await mockAuthService.login();
-    setUser(user);
+  const checkAuth = async () => {
+    try {
+      const user = await getCurrentUser();
+      setIsLoggedIn(user !== null);
+    } catch (e) {}
   };
 
-  const logout = () => setUser(null);
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const login = async (username: string, password: string) => {
+    const loginResponse = await loginWithCognito(username, password);
+    if (
+      loginResponse.nextStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED"
+    ) {
+      setShouldResetPassword(true);
+      setIsLoggedIn(true);
+      return true;
+    }
+    setIsLoggedIn(loginResponse.isSignedIn);
+    return false;
+  };
+
+  const logout = async () => {
+    await logoutWithCognito();
+    setUser(null);
+    setIsLoggedIn(false);
+    setShouldResetPassword(false);
+  };
+
+  const setAuthConfig = (config: {
+    userPoolId: string;
+    userPoolClientId: string;
+  }) => {
+    updateAuthConfig(config);
+    setIsAuthConfigureed(true);
+    checkAuth();
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        isAuthConfigured,
+        setAuthConfig,
+        user,
+        isLoggedIn,
+        shouldResetPassword,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -2,7 +2,7 @@ import "./LoginForm.style.css";
 import { useLoginForm } from "../domain/behavior/useLoginForm";
 
 export const LoginForm = () => {
-  const { username, password, setUsername, setPassword, handleLogin } =
+  const { username, password, setUsername, setPassword, handleLogin, isError } =
     useLoginForm();
 
   return (
@@ -24,6 +24,12 @@ export const LoginForm = () => {
         onChange={(e) => setPassword(e.target.value)}
         required
       />
+      {isError && (
+        <p className="error-message">Invalid credentials, please try again.</p>
+      )}
+      <a href="/forgot-password" className="forgot-password-link">
+        Forgot password?
+      </a>
       <button
         className="login-button"
         onClick={(e) => handleLogin(e)}

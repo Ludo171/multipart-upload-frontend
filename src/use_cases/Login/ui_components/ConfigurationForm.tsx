@@ -5,9 +5,13 @@ export const ConfigurationForm = () => {
   const {
     apiUrl,
     apiKey,
+    authUserPoolId,
+    authClientId,
     isEditable,
     setApiUrl,
     setApiKey,
+    setAuthUserPoolId,
+    setAuthClientId,
     setParams,
     editParams,
   } = useConfigurationForm();
@@ -28,6 +32,22 @@ export const ConfigurationForm = () => {
         placeholder="API Key"
         value={apiKey}
         onChange={(e) => setApiKey(e.target.value)}
+        required
+        disabled={!isEditable}
+      />
+      <input
+        type="text"
+        placeholder="Auth User Pool ID"
+        value={authUserPoolId}
+        onChange={(e) => setAuthUserPoolId(e.target.value)}
+        required
+        disabled={!isEditable}
+      />
+      <input
+        type="text"
+        placeholder="Auth Client ID"
+        value={authClientId}
+        onChange={(e) => setAuthClientId(e.target.value)}
         required
         disabled={!isEditable}
       />
