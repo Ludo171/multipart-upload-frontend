@@ -11,12 +11,12 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
   redirectPath = "/",
   ...props
 }) => {
-  const { isAuthConfigured, isLoggedIn } = useAuth();
+  const { isAuthConfigured, isLoggedIn, shouldResetPassword } = useAuth();
 
   return (
     <ProtectedRoute
       redirectPath={redirectPath}
-      isAllowed={isAuthConfigured && isLoggedIn}
+      isAllowed={isAuthConfigured && isLoggedIn && !shouldResetPassword}
       {...props}
     />
   );
@@ -26,12 +26,12 @@ export const UnAuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
   redirectPath = "/",
   ...props
 }) => {
-  const { isAuthConfigured, isLoggedIn } = useAuth();
+  const { isAuthConfigured, isLoggedIn, shouldResetPassword } = useAuth();
 
   return (
     <ProtectedRoute
       redirectPath={redirectPath}
-      isAllowed={!isAuthConfigured || !isLoggedIn}
+      isAllowed={!isAuthConfigured || !isLoggedIn || shouldResetPassword}
       {...props}
     />
   );

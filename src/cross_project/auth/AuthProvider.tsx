@@ -1,5 +1,6 @@
 import React, { createContext, useEffect } from "react";
 import {
+  confirmSignInWithNewPassword,
   loginWithCognito,
   logoutWithCognito,
   updateAuthConfig,
@@ -17,6 +18,7 @@ type AuthContextType = {
   isLoggedIn: boolean;
   shouldResetPassword: boolean;
   login: (username: string, password: string) => Promise<boolean>;
+  confirmNewPassword: (newPassword: string) => Promise<boolean>;
   logout: () => void;
 };
 
@@ -27,11 +29,12 @@ const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
   shouldResetPassword: false,
   login: async () => false,
+  confirmNewPassword: async () => false,
   logout: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: JSX.Element }) => {
-  const [isAuthConfigured, setIsAuthConfigureed] = React.useState(false);
+  const [isAuthConfigured, setIsAuthConfigured] = React.useState(false);
   const [user, setUser] = React.useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [shouldResetPassword, setShouldResetPassword] = React.useState(false);
@@ -60,6 +63,15 @@ export const AuthProvider = ({ children }: { children: JSX.Element }) => {
     return false;
   };
 
+  const confirmNewPassword = async (newPassword: string) => {
+    const confirmation = await confirmSignInWithNewPassword(newPassword);
+    if (confirmation === true) {
+      setShouldResetPassword(false);
+      setIsLoggedIn(true);
+    }
+    return confirmation;
+  };
+
   const logout = async () => {
     await logoutWithCognito();
     setUser(null);
@@ -72,7 +84,7 @@ export const AuthProvider = ({ children }: { children: JSX.Element }) => {
     userPoolClientId: string;
   }) => {
     updateAuthConfig(config);
-    setIsAuthConfigureed(true);
+    setIsAuthConfigured(true);
     checkAuth();
   };
 
@@ -85,6 +97,7 @@ export const AuthProvider = ({ children }: { children: JSX.Element }) => {
         isLoggedIn,
         shouldResetPassword,
         login,
+        confirmNewPassword,
         logout,
       }}
     >

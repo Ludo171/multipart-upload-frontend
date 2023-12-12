@@ -1,5 +1,10 @@
 import { Amplify } from "aws-amplify";
-import { signIn, signOut, getCurrentUser } from "aws-amplify/auth";
+import {
+  signIn,
+  signOut,
+  getCurrentUser,
+  confirmSignIn,
+} from "aws-amplify/auth";
 
 export const defaultAuthConfig = {
   Auth: {
@@ -54,12 +59,12 @@ export const loginWithCognito = async (
   password: string
 ): Promise<LoginResponse> => {
   try {
-    const reponse = await signIn({ username, password });
+    const response = await signIn({ username, password });
 
-    console.log("cognitoResponse", reponse);
+    console.log("cognitoResponse", response);
 
     if (
-      reponse.nextStep.signInStep ===
+      response.nextStep.signInStep ===
       "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED"
     ) {
       return {
@@ -68,7 +73,7 @@ export const loginWithCognito = async (
       };
     }
 
-    if (reponse.nextStep.signInStep === "DONE") {
+    if (response.nextStep.signInStep === "DONE") {
       return {
         isSignedIn: true,
         nextStep: "DONE",
@@ -87,6 +92,23 @@ export const loginWithCognito = async (
       };
     }
     return AuthenticationError;
+  }
+};
+
+export const PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\^$*.\[\]{}()?\-"!@#%&\/\\,><':;|_~`+=]).+$/;
+
+export const confirmSignInWithNewPassword = async (newPassword: string) => {
+  try {
+    const response = await confirmSignIn({
+      challengeResponse: newPassword,
+    });
+    if (response.nextStep.signInStep === "DONE") {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
   }
 };
 
