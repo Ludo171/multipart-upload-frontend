@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
-import { Uploader } from "./utils/Uploader";
-import { AxiosInstance } from "axios";
+import { Uploader } from "./upload.service";
+import { useApiClient } from "../../../../../../cross_project/api_client/ApiClientProvider";
+import axios from "axios";
 
 export type FileUploadInfo = {
   uploadId: string;
@@ -8,7 +9,11 @@ export type FileUploadInfo = {
   partUploadUrls: string[];
 };
 
-export const useOneBiopsyFileUpload = ({onUploadCompleted} : {onUploadCompleted : ()=>void }) => {
+export const useOneBiopsyFileUpload = ({
+  onUploadCompleted,
+}: {
+  onUploadCompleted: () => void;
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploader, setUploader] = useState<any>(undefined);
@@ -23,14 +28,17 @@ export const useOneBiopsyFileUpload = ({onUploadCompleted} : {onUploadCompleted 
     }
   };
 
+  const { apiConfig } = useApiClient();
+  const apiClient = axios.create(apiConfig);
+
   const startUpload = useCallback(
-    (axiosInstance: AxiosInstance, fileUploadInfo: FileUploadInfo) => {
+    (fileUploadInfo: FileUploadInfo) => {
       if (isFileUploadReadyToStart && selectedFile !== null) {
         let percentage: any = undefined;
 
         const uploaderOptions = {
           file: selectedFile,
-          apiClient: axiosInstance,
+          apiClient: apiClient,
         };
         const uploader = new Uploader(uploaderOptions);
         setUploader(uploader);
@@ -57,7 +65,7 @@ export const useOneBiopsyFileUpload = ({onUploadCompleted} : {onUploadCompleted 
         uploader.start(fileUploadInfo);
       }
     },
-    [isFileUploadReadyToStart, selectedFile, onUploadCompleted]
+    [isFileUploadReadyToStart, selectedFile, apiClient, onUploadCompleted]
   );
 
   const cancelUpload = useCallback(() => {

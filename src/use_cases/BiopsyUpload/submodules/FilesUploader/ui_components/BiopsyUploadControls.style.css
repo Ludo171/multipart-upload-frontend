@@ -1,0 +1,14 @@
+
+.controls {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.controls div {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+}
