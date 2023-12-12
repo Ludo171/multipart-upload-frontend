@@ -17,6 +17,10 @@ export const useLoginForm = () => {
     }
   };
 
+  const openForgotPasswordRequestPage = () => {
+    alert("Not implemented for this Proof of Concept");
+  };
+
   return {
     username,
     password,
@@ -24,5 +28,6 @@ export const useLoginForm = () => {
     setUsername,
     setPassword,
     handleLogin,
+    openForgotPasswordRequestPage,
   };
 };

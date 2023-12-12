@@ -1,9 +1,17 @@
 import "./LoginForm.style.css";
 import { useLoginForm } from "../domain/behavior/useLoginForm";
+import { ROUTES } from "../../../cross_project/router/routes";
 
 export const LoginForm = () => {
-  const { username, password, setUsername, setPassword, handleLogin, isError } =
-    useLoginForm();
+  const {
+    username,
+    password,
+    setUsername,
+    setPassword,
+    handleLogin,
+    isError,
+    openForgotPasswordRequestPage,
+  } = useLoginForm();
 
   return (
     <form className="login-form">
@@ -27,9 +35,12 @@ export const LoginForm = () => {
       {isError && (
         <p className="error-message">Invalid credentials, please try again.</p>
       )}
-      <a href="/forgot-password" className="forgot-password-link">
+      <span
+        className="forgot-password-link"
+        onClick={openForgotPasswordRequestPage}
+      >
         Forgot password?
-      </a>
+      </span>
       <button
         className="login-button"
         onClick={(e) => handleLogin(e)}
